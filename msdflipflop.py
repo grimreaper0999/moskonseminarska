@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     mycell = grn.grn()
 
-    registercell("mycell", mycell, ns=[5, 10], Kds=[10])
+    registercell("mycell", mycell, inputname="mycell_QBAR")
 
     print(mycell.genes)
     mycell.plot_network()
@@ -165,9 +165,14 @@ if __name__ == "__main__":
 
     clks = [0 if i%2==0 else 100 for i in range(10)]
     clks = [0 for i in range(10)]
+    clks = [0 if i%2==0 and i < 5 else 100 for i in range(10)]
+    clks = np.concat([np.repeat(0, 5),[100 if i%4==0 else 0 for i in range(10)]])
+    gt = np.concat([np.repeat(0, 1255), np.repeat(100, 1004), np.repeat(0, 1004), np.repeat(100, 502)])
     data = [0 if i<5 else 100 for i in range(10)]
-    T, Y = simulator.simulate_sequence(mycell, [(data[i], clks[i]) for i in range(len(clks))], t_single = 250, plot_on=False)
-    plt.plot(T, Y[:, [0, 1]], '--')
-    plt.plot(T, Y[:, [8, 9]])
-    plt.legend(np.array(mycell.species_names)[[0, 1, 8, 9]])
+    data = [100 for i in range(10)]
+    T, Y = simulator.simulate_sequence(mycell, clks, t_single = 250, plot_on=False) #[(data[i], clks[i]) for i in range(len(clks))]
+    plt.plot(T, Y[:, [0]], '--')
+    plt.plot(T, Y[:, [7, 8]])
+    plt.plot(T, gt)
+    plt.legend(np.array(mycell.species_names)[[0, 7, 8]])
     plt.show()

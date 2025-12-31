@@ -75,14 +75,14 @@ def registercell(name, network, clkname=None, inputname=None, decays=None, Kds=N
     # MNAND1 = NAND(D, CLK)
     mnand1_reg = [
         {'name': inputname,   'type': -1, 'Kd': Kds[0], 'n': ns[0]},
-        {'name': clkname, 'type': -1, 'Kd': Kds[1], 'n': ns[1]}
+        {'name': clkname,     'type': -1, 'Kd': Kds[1], 'n': ns[1]}
     ]
     network.add_gene(10, mnand1_reg, [{"name": f"{name}_MNAND1"}], logic_type="or")
 
     # MNAND2 = NAND(~D, CLK)
     mnand2_reg = [
-        {'name': inputname,   'type': 1,  'Kd': Kds[2], 'n': ns[2]},
-        {'name': clkname, 'type': -1, 'Kd': Kds[3], 'n': ns[3]}
+        {'name': inputname,   'type':  1, 'Kd': Kds[2], 'n': ns[2]},
+        {'name': clkname,     'type': -1, 'Kd': Kds[3], 'n': ns[3]}
     ]
     network.add_gene(10, mnand2_reg, [{"name": f"{name}_MNAND2"}], logic_type="or")
 
@@ -107,14 +107,14 @@ def registercell(name, network, clkname=None, inputname=None, decays=None, Kds=N
     # SNAND1 = NAND(MNAND3, ~CLK)
     snand1_reg = [
         {'name': f'{name}_MNAND3', 'type': -1, 'Kd': Kds[8], 'n': ns[8]},
-        {'name': clkname,    'type': 1,  'Kd': Kds[9], 'n': ns[9]}
+        {'name': clkname,          'type':  1, 'Kd': Kds[9], 'n': ns[9]}
     ]
     network.add_gene(10, snand1_reg, [{"name": f"{name}_SNAND1"}], logic_type="or")
 
     # SNAND2 = NAND(MNAND4, ~CLK)
     snand2_reg = [
         {'name': f'{name}_MNAND4', 'type': -1, 'Kd': Kds[10], 'n': ns[10]},
-        {'name': clkname,    'type': 1,  'Kd': Kds[11], 'n': ns[11]}
+        {'name': clkname,          'type':  1, 'Kd': Kds[11], 'n': ns[11]}
     ]
     network.add_gene(10, snand2_reg, [{"name": f"{name}_SNAND2"}], logic_type="or")
 
@@ -135,6 +135,18 @@ def registercell(name, network, clkname=None, inputname=None, decays=None, Kds=N
         {'name': f'{name}_Q',      'type': -1, 'Kd': Kds[15], 'n': ns[15]}
     ]
     network.add_gene(10, qbar_reg, [{"name": f"{name}_QBAR"}], logic_type="or")
+
+
+def truthgenerator(clks):
+    
+    # Extract rising edges
+    pts = [0] + [i for i in range(len(clks)-1) if clks[i+1]-clks[i]==100] + [len(clks)-1]
+    truth = np.array([])
+
+    # Construct ground truth based on rising edges
+    for p in range(len(pts)-1):
+        truth = np.concatenate([truth, np.repeat(100-(100 if len(truth)==0 else truth[-1]), pts[p+1]-pts[p])])
+    return np.concatenate([clks[0], truth])
 
 
 
@@ -167,12 +179,13 @@ if __name__ == "__main__":
     clks = [0 for i in range(10)]
     clks = [0 if i%2==0 and i < 5 else 100 for i in range(10)]
     clks = np.concat([np.repeat(0, 5),[100 if i%4==0 else 0 for i in range(10)]])
-    gt = np.concat([np.repeat(0, 1255), np.repeat(100, 1004), np.repeat(0, 1004), np.repeat(100, 502)])
     data = [0 if i<5 else 100 for i in range(10)]
     data = [100 for i in range(10)]
     T, Y = simulator.simulate_sequence(mycell, clks, t_single = 250, plot_on=False) #[(data[i], clks[i]) for i in range(len(clks))]
+    t = truthgenerator(Y[:, [0]])
+    print(t)
     plt.plot(T, Y[:, [0]], '--')
     plt.plot(T, Y[:, [7, 8]])
-    plt.plot(T, gt)
+    plt.plot(T, t)
     plt.legend(np.array(mycell.species_names)[[0, 7, 8]])
     plt.show()

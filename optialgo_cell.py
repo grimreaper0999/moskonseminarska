@@ -1,6 +1,7 @@
 import pygad
 import grn
-from msdflipflop import registercell
+import simulator
+import msdflipflop
 import numpy as np
 
 # ------------------------
@@ -12,7 +13,7 @@ GENERATIONS = 1000
 PARENTS_MATING = 500
 POPULATION_SIZE = 2000
 PARENT_SELECTION_TYPE = "sss"
-KEEP_PARENTS = True
+KEEP_PARENTS = 200
 CROSSOVER_TYPE = "scattered"
 MUTATION_TYPE = "random"
 MUTATION_PROBABILITY = 0.2
@@ -31,7 +32,6 @@ N_GENES = 2
 # Clock inputs, data inputs and ground truth to test the cell behavior
 clks = np.concat([np.repeat(0, 5),[100 if i%4==0 else 0 for i in range(10)]])
 data = None
-ground_truth = np.concat([np.repeat(0, 1255), np.repeat(100, 1004), np.repeat(0, 1004), np.repeat(100, 502)])
 
 # ------------------------
 # ALGORITHM PREPARATION
@@ -40,6 +40,8 @@ ground_truth = np.concat([np.repeat(0, 1255), np.repeat(100, 1004), np.repeat(0,
 # Fitness function - determining how good a solution is
 def fitness_func(ga_instance, solution, solution_idx):
 
+    print(solution)
+
     # Preparation of parameters
     decays = [DECAY_VALUES[i] for i in solution[0:DECAY_GENES]]
     Kds = [KD_VALUES[i] for i in solution[DECAY_GENES:DECAY_GENES+KD_GENES]]
@@ -47,18 +49,16 @@ def fitness_func(ga_instance, solution, solution_idx):
 
     cell = grn.grn()
 
-    err = 0
-
     # Simulating the cell using given clock and input data, return MSE of Q vs. ground truth
     if not data:
-        registercell("cell", cell, inputname="cell_QBAR", decays=decays, Kds=Kds, ns=ns)
+        msdflipflop.registercell("cell", cell, inputname="cell_QBAR", decays=decays, Kds=Kds, ns=ns)
         _, Y = simulator.simulate_sequence(cell, clks, t_single = 250, plot_on=False)
-        return -np.mean((Y[:, 7]-ground_truth)**2)
+        return -np.mean((Y[:, 7]-msdflipflop.truthgenerator(Y[0]))**2)
 
     else:
-        registercell("cell", cell, decays=decays, Kds=Kds, ns=ns)
+        msdflipflop.registercell("cell", cell, decays=decays, Kds=Kds, ns=ns)
         _, Y = simulator.simulate_sequence(cell, [(data[i], clks[i]) for i in range(len(clks))], t_single = 250, plot_on=False)
-        return -np.mean((Y[:, 8]-ground_truth)**2)
+        return -np.mean((Y[:, 8]-msdflipflop.truthgenerator(Y[0]))**2)
 
 
 

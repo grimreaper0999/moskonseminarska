@@ -146,7 +146,7 @@ def truthgenerator(clks):
     # Construct ground truth based on rising edges
     for p in range(len(pts)-1):
         truth = np.concatenate([truth, np.repeat(100-(100 if len(truth)==0 else truth[-1]), pts[p+1]-pts[p])])
-    return np.concatenate([clks[0], truth])
+    return np.concatenate([[clks[0]], truth])
 
 
 

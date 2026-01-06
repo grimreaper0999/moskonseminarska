@@ -10,25 +10,25 @@ import tqdm
 # ------------------------
 
 # Counter size
-D = 1
+D = 3
 
 # Basic genetic algo hyperparameters
-GENERATIONS = 100
-PARENTS_MATING = 400
-POPULATION_SIZE = 2000
+GENERATIONS = 10
+PARENTS_MATING = 4
+POPULATION_SIZE = 20
 PARENT_SELECTION_TYPE = "sss"
-KEEP_PARENTS = 200
+KEEP_PARENTS = 2
 CROSSOVER_TYPE = "scattered"
 MUTATION_TYPE = "random"
 MUTATION_PROBABILITY = 0.2
 
 # Gene value pool initialization
-CELL_DECAY_VALUES = [0, 0.1, 0.2, 0.5]
-CELL_KD_VALUES = [0.1, 0.2, 0.5, 1, 2, 5, 10]
-CELL_N_VALUES = [1, 2, 3, 5, 10]
-INSTR_DECAY_VALUES = [0, 0.1, 0.2, 0.5]
-CONN_KD_VALUES = [0.1, 0.2, 0.5, 1, 2, 5, 10]
-CONN_N_VALUES = [1, 2, 3, 5, 10]
+CELL_DECAY_VALUES = np.array([0, 0.1, 0.2, 0.5])
+CELL_KD_VALUES = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10])
+CELL_N_VALUES = np.array([1, 2, 3, 5, 10])
+INSTR_DECAY_VALUES = np.array([0, 0.1, 0.2, 0.5])
+CONN_KD_VALUES = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10])
+CONN_N_VALUES = np.array([1, 2, 3, 5, 10])
 
 # Parameters for converting genes to cell parameters
 # See msdflipflop.py and 2mcounter.py for valid values
@@ -98,6 +98,19 @@ ga_instance = pygad.GA(num_generations=GENERATIONS,
 
 ga_instance.run()
 
+temp1 = np.array([CELL_DECAY_GENES, CELL_KD_GENES, CELL_N_GENES, INSTR_DECAY_GENES, CONN_KD_GENES, CONN_N_GENES])
+temp2 = [np.sum(temp1[:i+1]) for i in range(len(temp1))]
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Parameters of the best solution : {solution}".format(solution=solution))
+print(("Parameters of the best solution :\n" +
+       "Cell decay values: {cedecay}\n" +
+       "Cell Kd values: {ceKds}\n" +
+       "Cell n values: {cens}\n" +
+       "Instruction decay values: {idecay}\n" +
+       "Connection Kd values: {coKds}\n" +
+       "Connection n values: {cons}").format(cedecay=CELL_DECAY_VALUES[(solution[:temp2[0]].astype(np.int32))],
+                                             ceKds=CELL_KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)],
+                                             cens=CELL_N_VALUES[solution[temp2[1]:temp2[2]].astype(np.int32)],
+                                             idecay=INSTR_DECAY_VALUES[solution[temp2[2]:temp2[3]].astype(np.int32)],
+                                             coKds=CONN_KD_VALUES[solution[temp2[3]:temp2[4]].astype(np.int32)],
+                                             cons=CONN_N_VALUES[solution[temp2[4]:].astype(np.int32)]))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))

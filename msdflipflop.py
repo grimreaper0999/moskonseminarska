@@ -182,7 +182,8 @@ if __name__ == "__main__":
     data = [0 if i<5 else 100 for i in range(10)]
     data = [100 for i in range(10)]
     T, Y = simulator.simulate_sequence(mycell, clks, t_single = 250, plot_on=False) #[(data[i], clks[i]) for i in range(len(clks))]
-    t = truthgenerator(Y[:, [0]])
+    print(Y[:, 0])
+    t = truthgenerator(Y[:, 0])
     print(t)
     plt.plot(T, Y[:, [0]], '--')
     plt.plot(T, Y[:, [7, 8]])

@@ -10,19 +10,19 @@ import tqdm
 # ------------------------
 
 # Basic genetic algo hyperparameters
-GENERATIONS = 200
-PARENTS_MATING = 40
-POPULATION_SIZE = 200
+GENERATIONS = 20
+PARENTS_MATING = 4
+POPULATION_SIZE = 20
 PARENT_SELECTION_TYPE = "rws"
-KEEP_PARENTS = 10
+KEEP_PARENTS = 1
 CROSSOVER_TYPE = "scattered"
 MUTATION_TYPE = "random"
 MUTATION_PROBABILITY = 0.3
 
 # Gene value pool initialization
-DECAY_VALUES = [0, 0.1, 0.2, 0.5]
-KD_VALUES = [0.1, 0.2, 0.5, 1, 2, 5, 10]
-N_VALUES = [1, 2, 3, 5, 10]
+DECAY_VALUES = np.array([0, 0.1, 0.2, 0.5])
+KD_VALUES = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10])
+N_VALUES = np.array([1, 2, 3, 5, 10])
 
 # Parameters for converting genes to cell parameters
 # See msdflipflop.py for valid values
@@ -83,6 +83,13 @@ ga_instance = pygad.GA(num_generations=GENERATIONS,
 
 ga_instance.run()
 
+temp1 = np.array([DECAY_GENES, KD_GENES, N_GENES])
+temp2 = [np.sum(temp1[:i+1]) for i in range(len(temp1))]
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Parameters of the best solution : {solution}".format(solution=solution))
+print(("Parameters of the best solution :\n" +
+       "Decay values: {decays}\n" +
+       "Kd values: {Kds}\n" +
+       "n values: {ns}").format(decays=DECAY_VALUES[solution[:temp2[0]].astype(np.int32)],
+                                Kds=KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)],
+                                ns=N_VALUES[solution[temp2[1]:].astype(np.int32)]))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))

@@ -13,8 +13,8 @@ import tqdm
 D = 1
 
 # Basic genetic algo hyperparameters
-GENERATIONS = 1000
-PARENTS_MATING = 500
+GENERATIONS = 100
+PARENTS_MATING = 400
 POPULATION_SIZE = 2000
 PARENT_SELECTION_TYPE = "sss"
 KEEP_PARENTS = 200
@@ -79,26 +79,25 @@ def fitness_func(ga_instance, solution, solution_idx):
 # RUNNING THE ALGORITHM
 # ------------------------
 
-with tqdm.tqdm(total=GENERATIONS) as pbar:
-    ga_instance = pygad.GA(num_generations=GENERATIONS,
-                        sol_per_pop=POPULATION_SIZE,
-                        num_parents_mating=PARENTS_MATING,
-                        num_genes=CELL_DECAY_GENES + CELL_KD_GENES + CELL_N_GENES,
-                        gene_space=np.repeat([range(len(CELL_DECAY_VALUES))], CELL_DECAY_GENES, axis=0).tolist()
-                                    + np.repeat([range(len(CELL_KD_VALUES))], CELL_KD_GENES, axis=0).tolist()
-                                    + np.repeat([range(len(CELL_N_VALUES))], CELL_N_GENES, axis=0).tolist()
-                                    + np.repeat([range(len(INSTR_DECAY_VALUES))], INSTR_DECAY_GENES, axis=0).tolist()
-                                    + np.repeat([range(len(CONN_KD_VALUES))], CONN_KD_GENES, axis=0).tolist()
-                                    + np.repeat([range(len(CONN_KD_VALUES))], CONN_KD_GENES, axis=0).tolist(),
-                        fitness_func=fitness_func,
-                        parent_selection_type=PARENT_SELECTION_TYPE,
-                        keep_parents=KEEP_PARENTS,
-                        crossover_type=CROSSOVER_TYPE,
-                        mutation_type=MUTATION_TYPE,
-                        mutation_probability=MUTATION_PROBABILITY)
+ga_instance = pygad.GA(num_generations=GENERATIONS,
+                    sol_per_pop=POPULATION_SIZE,
+                    num_parents_mating=PARENTS_MATING,
+                    num_genes=CELL_DECAY_GENES + CELL_KD_GENES + CELL_N_GENES + INSTR_DECAY_GENES + CONN_KD_GENES + CONN_N_GENES,
+                    gene_space=np.repeat([range(len(CELL_DECAY_VALUES))], CELL_DECAY_GENES, axis=0).tolist()
+                                + np.repeat([range(len(CELL_KD_VALUES))], CELL_KD_GENES, axis=0).tolist()
+                                + np.repeat([range(len(CELL_N_VALUES))], CELL_N_GENES, axis=0).tolist()
+                                + np.repeat([range(len(INSTR_DECAY_VALUES))], INSTR_DECAY_GENES, axis=0).tolist()
+                                + np.repeat([range(len(CONN_KD_VALUES))], CONN_KD_GENES, axis=0).tolist()
+                                + np.repeat([range(len(CONN_N_VALUES))], CONN_N_GENES, axis=0).tolist(),
+                    fitness_func=fitness_func,
+                    parent_selection_type=PARENT_SELECTION_TYPE,
+                    keep_parents=KEEP_PARENTS,
+                    crossover_type=CROSSOVER_TYPE,
+                    mutation_type=MUTATION_TYPE,
+                    mutation_probability=MUTATION_PROBABILITY)
 
-    ga_instance.run()
+ga_instance.run()
 
-    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-    print("Parameters of the best solution : {solution}".format(solution=solution))
-    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+solution, solution_fitness, solution_idx = ga_instance.best_solution()
+print("Parameters of the best solution : {solution}".format(solution=solution))
+print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))

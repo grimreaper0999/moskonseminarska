@@ -14,10 +14,10 @@ D = 3
 
 # Basic genetic algo hyperparameters
 GENERATIONS = 10
-PARENTS_MATING = 4
-POPULATION_SIZE = 20
+PARENTS_MATING = 20
+POPULATION_SIZE = 100
 PARENT_SELECTION_TYPE = "sss"
-KEEP_PARENTS = 2
+KEEP_PARENTS = 4
 CROSSOVER_TYPE = "scattered"
 MUTATION_TYPE = "random"
 MUTATION_PROBABILITY = 0.2
@@ -107,10 +107,10 @@ print(("Parameters of the best solution :\n" +
        "Cell n values: {cens}\n" +
        "Instruction decay values: {idecay}\n" +
        "Connection Kd values: {coKds}\n" +
-       "Connection n values: {cons}").format(cedecay=CELL_DECAY_VALUES[(solution[:temp2[0]].astype(np.int32))],
-                                             ceKds=CELL_KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)],
-                                             cens=CELL_N_VALUES[solution[temp2[1]:temp2[2]].astype(np.int32)],
-                                             idecay=INSTR_DECAY_VALUES[solution[temp2[2]:temp2[3]].astype(np.int32)],
-                                             coKds=CONN_KD_VALUES[solution[temp2[3]:temp2[4]].astype(np.int32)],
-                                             cons=CONN_N_VALUES[solution[temp2[4]:].astype(np.int32)]))
+       "Connection n values: {cons}").format(cedecay=CELL_DECAY_VALUES[(solution[:temp2[0]].astype(np.int32))].tolist(),
+                                             ceKds=CELL_KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)].tolist(),
+                                             cens=CELL_N_VALUES[solution[temp2[1]:temp2[2]].astype(np.int32)].tolist(),
+                                             idecay=INSTR_DECAY_VALUES[solution[temp2[2]:temp2[3]].astype(np.int32)].tolist(),
+                                             coKds=CONN_KD_VALUES[solution[temp2[3]:temp2[4]].astype(np.int32)].tolist(),
+                                             cons=CONN_N_VALUES[solution[temp2[4]:].astype(np.int32)].tolist()))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))

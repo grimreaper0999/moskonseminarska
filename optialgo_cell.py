@@ -11,11 +11,11 @@ import tqdm
 
 # Basic genetic algo hyperparameters
 GENERATIONS = 20
-PARENTS_MATING = 4
-POPULATION_SIZE = 20
+PARENTS_MATING = 20
+POPULATION_SIZE = 100
 PARENT_SELECTION_TYPE = "rws"
-KEEP_PARENTS = 1
-CROSSOVER_TYPE = "scattered"
+KEEP_PARENTS = 4
+CROSSOVER_TYPE = "uniform"
 MUTATION_TYPE = "random"
 MUTATION_PROBABILITY = 0.3
 
@@ -26,7 +26,7 @@ N_VALUES = np.array([1, 2, 3, 5, 10])
 
 # Parameters for converting genes to cell parameters
 # See msdflipflop.py for valid values
-DECAY_GENES = 1
+DECAY_GENES = 8
 KD_GENES = 2
 N_GENES = 2
 
@@ -54,12 +54,14 @@ def fitness_func(ga_instance, solution, solution_idx):
     if not data:
         msdflipflop.registercell("cell", cell, inputname="cell_QBAR", decays=decays, Kds=Kds, ns=ns)
         _, Y = simulator.simulate_sequence(cell, clks, t_single = 250, plot_on=False)
-        return -np.mean((Y[:, 7]-msdflipflop.truthgenerator(Y[:, 0]))**2)
+        gt = msdflipflop.truthgenerator(Y[:, 0])
+        return -np.mean((Y[:, 7]-gt)**2) #- np.mean((Y[:, 8]-(100-gt))**2)
 
     else:
         msdflipflop.registercell("cell", cell, decays=decays, Kds=Kds, ns=ns)
         _, Y = simulator.simulate_sequence(cell, [(data[i], clks[i]) for i in range(len(clks))], t_single = 250, plot_on=False)
-        return -np.mean((Y[:, 8]-msdflipflop.truthgenerator(Y[:, 0]))**2)
+        gt = msdflipflop.truthgenerator(Y[:, 0])
+        return -np.mean((Y[:, 8]-gt)**2) #- np.mean((Y[:, 9]-(100-gt))**2)
 
 
 
@@ -89,7 +91,7 @@ solution, solution_fitness, solution_idx = ga_instance.best_solution()
 print(("Parameters of the best solution :\n" +
        "Decay values: {decays}\n" +
        "Kd values: {Kds}\n" +
-       "n values: {ns}").format(decays=DECAY_VALUES[solution[:temp2[0]].astype(np.int32)],
-                                Kds=KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)],
-                                ns=N_VALUES[solution[temp2[1]:].astype(np.int32)]))
+       "n values: {ns}").format(decays=DECAY_VALUES[solution[:temp2[0]].astype(np.int32)].tolist(),
+                                Kds=KD_VALUES[solution[temp2[0]:temp2[1]].astype(np.int32)].tolist(),
+                                ns=N_VALUES[solution[temp2[1]:].astype(np.int32)].tolist()))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))

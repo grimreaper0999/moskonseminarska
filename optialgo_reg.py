@@ -10,17 +10,17 @@ import tqdm
 # ------------------------
 
 # Counter size
-D = 3
+D = 2
 
 # Basic genetic algo hyperparameters
-GENERATIONS = 10
-PARENTS_MATING = 20
-POPULATION_SIZE = 100
-PARENT_SELECTION_TYPE = "sss"
-KEEP_PARENTS = 4
-CROSSOVER_TYPE = "scattered"
+GENERATIONS = 20
+PARENTS_MATING = 4
+POPULATION_SIZE = 20
+PARENT_SELECTION_TYPE = "rws"
+KEEP_PARENTS = 2
+CROSSOVER_TYPE = "uniform"
 MUTATION_TYPE = "random"
-MUTATION_PROBABILITY = 0.2
+MUTATION_PROBABILITY = 0.1
 
 # Gene value pool initialization
 CELL_DECAY_VALUES = np.array([0, 0.1, 0.2, 0.5])
@@ -69,7 +69,7 @@ def fitness_func(ga_instance, solution, solution_idx):
     
     err = 0
     for i in range(-2*D, 0):
-        err += -np.mean((Y[:, i]-ground_truth)**2)
+        err += -np.mean((Y[:, i]-ground_truth[i+2*D])**2)
     
     return err 
 
